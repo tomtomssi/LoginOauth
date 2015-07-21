@@ -158,3 +158,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 
+.credentials/
+.credentials/client_secrets.json
