@@ -37,8 +37,15 @@ def get_credentials():
 
 
 def single_message(service):
-    for message in service.users().messages().list(userId="me", labelIds="Label_1").execute()['messages']:
-        print(message)
+    accepted_messages = []
+    for response in service.users().messages().list(userId="me", labelIds="Label_1").execute()['messages']:
+        message = service.users().messages().get(userId="me", id=response['id']).execute()
+        headers = message['payload']['headers']
+        for item in headers:
+            if 'Return-Path' in item['name']:
+                if 'notice' in item['value']:
+                    accepted_messages.extend(message['payload']['parts'])
+    print(accepted_messages)
 
 
 def main():
