@@ -36,21 +36,17 @@ def get_credentials():
     return credentials
 
 
+def single_message(service):
+    for message in service.users().messages().list(userId="me", labelIds="Label_1").execute()['messages']:
+        print(message)
+
+
 def main():
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('gmail', 'v1', http=http)
 
-    results = service.users().labels().list(userId='me').execute()
-    labels = results.get('labels', [])
-
-    if not labels:
-        print('No labels found.')
-    else:
-        print('Labels:')
-        for label in labels:
-            print(label['name'])
-
+    single_message(service)
 
 if __name__ == '__main__':
     main()
