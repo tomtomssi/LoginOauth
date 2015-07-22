@@ -6,6 +6,7 @@ import oauth2client
 from oauth2client import client
 from oauth2client import tools
 import subprocess
+import re
 
 try:
     import argparse
@@ -57,8 +58,8 @@ def find_message_with_link(base64_messages):
                                    stderr=subprocess.PIPE,
                                    stdin=subprocess.PIPE,
                                    shell=True).communicate()
-            print(res, "\n")
-
+            asd = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+            print(re.findall(asd, str(res)))
 
 
 def main():
