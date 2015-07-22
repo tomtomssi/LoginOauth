@@ -5,6 +5,7 @@ from apiclient import discovery
 import oauth2client
 from oauth2client import client
 from oauth2client import tools
+import subprocess
 
 try:
     import argparse
@@ -45,7 +46,19 @@ def single_message(service):
             if 'Return-Path' in item['name']:
                 if 'notice' in item['value']:
                     accepted_messages.extend(message['payload']['parts'])
-    print(accepted_messages)
+    find_message_with_link(accepted_messages)
+
+
+def find_message_with_link(base64_messages):
+    for base64_encoded in base64_messages:
+        if 'text/plain' in base64_encoded['mimeType']:
+            res = subprocess.Popen("echo {0} | base64 --decode".format(base64_encoded['body']['data']),
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   stdin=subprocess.PIPE,
+                                   shell=True).communicate()
+            print(res, "\n")
+
 
 
 def main():
