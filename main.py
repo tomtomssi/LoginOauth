@@ -7,6 +7,8 @@ from oauth2client import client
 from oauth2client import tools
 import subprocess
 import re
+import urllib.request
+from bs4 import BeautifulSoup as Soup
 
 try:
     import argparse
@@ -47,10 +49,19 @@ def single_message(service):
             if 'Return-Path' in item['name']:
                 if 'notice' in item['value']:
                     accepted_messages.extend(message['payload']['parts'])
-    find_message_with_link(accepted_messages)
+    requests(find_message_with_link(accepted_messages))
+
+
+def requests(links):
+    for link in links:
+        if 'confirm-host' in link:
+            html = urllib.request.urlopen(link)
+            soup = Soup(html)
+            print(soup)
 
 
 def find_message_with_link(base64_messages):
+    links = []
     for base64_encoded in base64_messages:
         if 'text/plain' in base64_encoded['mimeType']:
             res = subprocess.Popen("echo {0} | base64 --decode".format(base64_encoded['body']['data']),
@@ -59,7 +70,8 @@ def find_message_with_link(base64_messages):
                                    stdin=subprocess.PIPE,
                                    shell=True).communicate()
             pattern = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-            print(re.findall(pattern, str(res)))
+            links.extend(re.findall(pattern, str(res)))
+    return links
 
 
 def main():
